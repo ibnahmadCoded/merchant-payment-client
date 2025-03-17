@@ -1,0 +1,35 @@
+{
+    "name": "merchant-payment-client",
+    "version": "0.1.0",
+    "description": "Frontend SDK for websites to accept payments from AI agents",
+    "main": "src/index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+      "ai",
+      "payment",
+      "merchant",
+      "gateway",
+      "client",
+      "sdk"
+    ],
+    "author": "Aliyu Alege <aliyualege@gmail.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ibnahmadcoded/merchant-payment-client.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ibnahmadcoded/merchant-payment-client/issues"
+    },
+    "homepage": "https://github.com/ibnahmadcoded/merchant-payment-client#readme",
+    "engines": {
+        "node": ">=12.0.0"
+    },
+    "files": [
+        "src",
+        "README.md",
+        "LICENSE"
+    ]
+}
