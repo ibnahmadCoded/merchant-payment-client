@@ -35,16 +35,22 @@ class MerchantPaymentClient {
     }
 
     /**
-     * Initialize the Server-Sent Events connection
-     * @private
-     */
-    _initializeEventSource() {
-        // Use Server-Sent Events to receive payment initation requests
-        this.eventSource = new EventSource(
-            `${this.baseUrl}/api/payments/events?merchant_id=${this.merchantId}&key=${this.publicKey}`
-        );
+ * Initialize the Server-Sent Events connection
+ * @private
+ */
+_initializeEventSource() {
+    if (this.eventSource) {
+        this.eventSource.close();
+    }
+    
+    // Use Server-Sent Events to receive payment initiation requests
+    this.eventSource = new EventSource(
+        `${this.baseUrl}/api/payments/events?merchant_id=${this.merchantId}&key=${this.publicKey}`,
+        { withCredentials: false }  // Explicitly set withCredentials to false for CORS
+    );
 
-        this.eventSource.onmessage = async (event) => {
+    this.eventSource.onmessage = async (event) => {
+        try {
             const data = JSON.parse(event.data);
 
             if (data.type === 'payment_request') {
@@ -55,14 +61,29 @@ class MerchantPaymentClient {
                     data.paymentAdvice
                 );
             }
-        };
+        } catch (error) {
+            console.error('Error processing event:', error);
+        }
+    };
 
-        this.eventSource.onerror = (error) => {
-            console.error('EventSource failed:', error);
-            // Attempt to reconnect after a delay
-            setTimeout(() => this._initializeEventSource(), 5000);
-        };
-    }
+    // Handle connection established
+    this.eventSource.addEventListener('connected', (event) => {
+        console.log('Payment gateway connected:', JSON.parse(event.data));
+    });
+
+    // Handle ping events
+    this.eventSource.addEventListener('ping', (event) => {
+        // Connection is still alive, no action needed
+    });
+
+    this.eventSource.onerror = (error) => {
+        console.error('EventSource failed:', error);
+        this.eventSource.close();
+        
+        // Attempt to reconnect after a delay
+        setTimeout(() => this._initializeEventSource(), 5000);
+    };
+}
 
     /**
      * Handle a payment request from an AI agent
